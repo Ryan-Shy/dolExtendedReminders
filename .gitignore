@@ -1,0 +1,9 @@
+
+/**/.vscode
+/dolRemoteSave
+/**/node_modules
+/**/__pycache__
+/**/*.db
+/**/*.zip
+/dist
+/integrate
