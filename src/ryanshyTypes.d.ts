@@ -23,6 +23,7 @@ type DolExtendedReminders = {
         dailyList?: JournalEntry[],
         weeklyList?: JournalEntry[],
         genericCheck?: (id: string, type: "daily" | "weekly" | "", checkMethod: (value: any) => boolean, parent: string = "") => boolean,
+        insecurityCheck?: (type: InsecurityType = "") => boolean,
     },
     dolExtendedReminders?: {
         OnIframeLoad?: () => void,
@@ -46,3 +47,10 @@ type JournalEntry = {
     hasRequirementMet: () => boolean,
     getDetails?: () => any,
 }
+
+type InsecurityType = ""
+                    | "pregnancy"
+                    | "big_breasts"
+                    | "small_breasts"
+                    | "big_penis"
+                    | "small_penis"

@@ -248,12 +248,183 @@ dolExtendedReminders.journal.genericCheck = function (id: string, type: "daily" 
     }
 }
 
+dolExtendedReminders.journal.insecurityCheck = function (type: InsecurityType = "") {
+    if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+        return false;
+    }
+    if (!globalThis.cw) {
+        return false;
+    }
+    const cw = globalThis.cw;
+    if (!cw.V) {
+        return false;
+    }
+    const V = cw.V;
+    const small_penis = function () : boolean {
+        const hasPenis = V.player?.penisExist ?? false;
+        const hasInsecurity = V.insecurity_penis_small > 0;
+        const hasSmallPenis = (V.player?.penissize ?? 0) < 2;
+        const hasAcceptance = V.acceptance_penis_small >= 1000;
+        return hasPenis && hasInsecurity && hasSmallPenis && !hasAcceptance;
+    }
+    const big_penis = function () : boolean {
+        const hasPenis = V.player?.penisExist ?? false;
+        const hasInsecurity = V.insecurity_penis_big > 0;
+        const hasBigPenis = (V.player?.penissize ?? 0) > ((V.player?.gender ?? "") === "m" ? 4 : 2);
+        const hasAcceptance = V.acceptance_penis_big >= 1000;
+        return hasPenis && hasInsecurity && hasBigPenis && !hasAcceptance;
+    }
+    const small_breasts = function () : boolean {
+        const isFemale = (V.player?.gender ?? "") === "f" ;
+        const hasInsecurity = V.insecurity_breasts_small > 0;
+        const hasSmallBreasts = (V.player?.breastsize ?? 0) >= 0 && (V.player?.breastsize ?? 0) <= 4;
+        const hasAcceptance = V.acceptance_breasts_small >= 1000;
+        return isFemale && hasInsecurity && hasSmallBreasts && !hasAcceptance;
+    }
+    const big_breasts = function () : boolean {
+        const hasInsecurity = V.insecurity_breasts_big > 0;
+        const hasBigBreasts = (V.player?.breastsize ?? 0) >= ((V.player?.gender ?? "") === "f" ? 8 : 6);
+        const hasAcceptance = V.acceptance_breasts_big >= 1000;
+        return hasInsecurity && hasBigBreasts && !hasAcceptance;
+    }
+    const pregnancy = function () : boolean {
+        const hasInsecurity = V.insecurity_pregnancy > 0;
+        const hasAcceptance = V.acceptance_pregnancy >= 1000;
+        if (!(cw as any).playerBellySize) {
+            return false;
+        }
+        const hasBigBelly = (cw as any).playerBellySize() >= 8;
+        return hasInsecurity && !hasAcceptance && hasBigBelly;
+    }
+    switch (type) {
+        case "":
+            return small_penis() || big_penis() || small_breasts() || big_breasts() || pregnancy();
+        case "pregnancy":
+            return pregnancy();
+        case "big_breasts":
+            return big_breasts();
+        case "small_breasts":
+            return small_breasts();
+        case "big_penis":
+            return big_penis();
+        case "small_penis":
+            return small_penis();
+        default:
+            return false;
+    }
+}
+
 dolExtendedReminders.journal.dailyList = [
     {
         name: "",
         parent: "",
-        isDone: () => {return false},
-        hasRequirementMet: () => {return false},
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return false
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return false
+        },
+    },
+    {
+        name: "Attend Mass",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("massAttended", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+                return false;
+            }
+            if (!globalThis.cw) {
+                return false;
+            }
+            const cw = globalThis.cw;
+            const JordanInit = cw.C?.npc?.Jordan?.init ?? false;
+            if (!JordanInit) {
+                return false;
+            }
+            if (!cw.Time) {
+                return false;
+            }
+            const weekDay = cw.Time['weekDay'];
+            const hour = cw.Time['hour'];
+            if (typeof weekDay !== "number" || typeof hour !== "number") {
+                return false;
+            }
+            return weekDay === 1 && hour <= 12;
+        },
+    },
+    {
+        name: "Mason is at the Lake",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("masonSpoken", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+                return false;
+            }
+            if (!globalThis.cw) {
+                return false;
+            }
+            const cw = globalThis.cw;
+            const schoolDay = cw.Time?.schoolDay ?? true;
+            if (schoolDay) {
+                return false;
+            }
+            const precipitation = cw.Weather?.precipitation ?? "none";
+            if (precipitation !== "rain") {
+                return false;
+            }
+            const dayState = cw.Time?.dayState ?? "";
+            if (dayState !== "day") {
+                return false;
+            }
+            const masonCount = cw.V?.mason_count ?? undefined;
+            return typeof masonCount === "number" && masonCount > 0;
+        },
+    },
+    {
+        name: "Mason is at the Pond",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("masonSpoken", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+                return false;
+            }
+            if (!globalThis.cw) {
+                return false;
+            }
+            const cw = globalThis.cw;
+            const masonCount = cw.V?.mason_count ?? undefined;
+            if (typeof masonCount !== "number" || masonCount < 2) {
+                return false
+            }
+            const dayState = cw.Time?.dayState ?? "";
+            if (dayState !== "dusk") {
+                return false;
+            }
+            const masonLake = cw.V?.daily?.masonLake ?? false;
+            if (masonLake) {
+                return true;
+            }
+            const schoolDay = cw.Time?.schoolDay ?? true;
+            if (schoolDay) {
+                return false;
+            }
+            const precipitation = cw.Weather?.precipitation ?? "none";
+            if (precipitation !== "rain") {
+                return false;
+            }
+            return true;
+        },
     },
     {
         name: "Hookah Parlour",
@@ -266,22 +437,150 @@ dolExtendedReminders.journal.dailyList = [
             if (!dolExtendedReminders.journal?.genericCheck) return false;
             return dolExtendedReminders.journal.genericCheck("hookah_state", "", (value) => value === 1 || value === 3);},
     },
-    /*
-     * TODO LIST:
-     * - massAttended
-     * - masonSpoken
-     * - masonLake
-     * - lakeMeditate
-     * - estateDone / estateBluffed
-     * - thicketBlackberries
-     * - cafeEaten
-     * - compoundState
-     * - yogaWillpower
-     * - hookah
-     * - stallRented
-     * - confessed
-     * - templePray
-     */
+    {
+        name: "Meditate at the Lake",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("lakeMeditate", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.insecurityCheck) return false;
+            return dolExtendedReminders.journal.insecurityCheck();
+        },
+    },
+    {
+        name: "Pray at the Temple",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("templePray", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.insecurityCheck) return false;
+            const JordanInit = globalThis?.cw?.C?.npc?.Jordan?.init ?? false;
+            if (!JordanInit) {
+                return false;
+            }
+            return dolExtendedReminders.journal.insecurityCheck();
+        },
+    },
+    {
+        name: "Take a yoga lesson",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("yogaWillpower", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+                return false;
+            }
+            if (!globalThis.cw) {
+                return false;
+            }
+            const cw = globalThis.cw;
+            const weekDay = cw.Time?.weekDay ?? 0;
+            if (typeof weekDay !== "number" || ![2,4,6].includes(weekDay)) {
+                return false;
+            }
+            return dolExtendedReminders.journal.genericCheck("dancestudiointro", "", (value) => !!value);
+        },
+    },
+    {
+        name: "Confess your Sins at the Temple",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("confessed", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            const JordanInit = globalThis?.cw?.C?.npc?.Jordan?.init ?? false;
+            return !!JordanInit;
+        },
+    },
+    {
+        name: "Rent a stall",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("stallRented", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+                return false;
+            }
+            if (!globalThis.cw) {
+                return false;
+            }
+            const cw = globalThis.cw;
+            const dayState = cw.Time?.dayState ?? "";
+            const hasAlreadyRented = dolExtendedReminders.journal.genericCheck("stallRented", "daily", (value) => !!value);
+            return dayState === "dawn" || hasAlreadyRented;
+        },
+    },
+    {
+        name: "Infiltrate the Elk Street Compound",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("compoundState", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("compoundcard", "", (value) => typeof value === "number" && value === 2);
+        },
+    },
+    {
+        name: "Buy something at the Cafe",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("cafeEaten", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            return true;
+        },
+    },
+    {
+        name: "Pick blackberries in the residential alleyways",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("thicketBlackberries", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("thicket", "", (value) => typeof value === "number" && value >= 4, "town_projects");
+        },
+    },
+    {
+        name: "Enter the Remy estate",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("estateDone", "daily", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.createCW || !dolExtendedReminders.createCW()) {
+                return false;
+            }
+            if (!globalThis.cw) {
+                return false;
+            }
+            const cw = globalThis.cw;
+            const farm_stage = cw.V?.farm_stage ?? 0;
+            if (typeof farm_stage === "number" && farm_stage > 4) {
+                return true;
+            }
+            if (!(cw as any).isPubfameTaskAccepted) {
+                return false;
+            }
+            return !!(cw as any).isPubfameTaskAccepted("wren");
+        },
+    },
 ];
 
 dolExtendedReminders.journal.weeklyList = [
