@@ -25,6 +25,8 @@ dolExtendedReminders.init = function () {
 
     // Load JS
     dolExtendedReminders.loadJS("/dolExtendedReminders/ryanshyLocalStorage.js");
+    dolExtendedReminders.loadJS("/dolExtendedReminders/settings.js");
+    dolExtendedReminders.loadJS("/dolExtendedReminders/ryanshyJournal.js");
 
     dolExtendedReminders.loadJS("/dolExtendedReminders/dolExtendedReminders.js");
 }
