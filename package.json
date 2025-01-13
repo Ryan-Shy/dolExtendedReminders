@@ -2,7 +2,7 @@
     "name": "dol_extended_reminders",
     "main": "index.html",
     "chromium-args": "--allow-file-access-from-files",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "scripts": {
         "build": "tsc --project tsconfig.json",
         "build:start": "npm run clean && npm run build && npm run dist && npm run integrate:html && npm run start",
