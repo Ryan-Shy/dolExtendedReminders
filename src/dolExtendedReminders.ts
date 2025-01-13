@@ -5,7 +5,7 @@ dolExtendedReminders.dolExtendedReminders = dolExtendedReminders.dolExtendedRemi
  * Core functions
  */
 dolExtendedReminders.dolExtendedReminders.OnLoad = function () {
-    // TODO
+    // TODO not needed, as we currently don't have a settings UI
 }
 
 dolExtendedReminders.dolExtendedReminders.OnIframeLoad = function () {

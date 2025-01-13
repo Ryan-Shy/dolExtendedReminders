@@ -581,6 +581,18 @@ dolExtendedReminders.journal.dailyList = [
             return !!(cw as any).isPubfameTaskAccepted("wren");
         },
     },
+    {
+        name: "Spar at the Temple",
+        parent: "",
+        isDone: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("temple_spar", "", (value) => !!value);
+        },
+        hasRequirementMet: () => {
+            if (!dolExtendedReminders.journal?.genericCheck) return false;
+            return dolExtendedReminders.journal.genericCheck("temple_rank", "", (value) => typeof value === "string" && (value === "monk" || value === "priest"));
+        },
+    },
 ];
 
 dolExtendedReminders.journal.weeklyList = [
@@ -1056,5 +1068,3 @@ dolExtendedReminders.journal.weeklyList = [
         },
     },
 ];
-
-dolExtendedReminders.journal
